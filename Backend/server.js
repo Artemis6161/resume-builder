@@ -7,6 +7,7 @@ require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 console.log("📁 Current directory:", __dirname);
 console.log("📄 Looking for .env at:", path.resolve(__dirname, '.env'));
 
+
 const app = express();
 
 // Middleware
