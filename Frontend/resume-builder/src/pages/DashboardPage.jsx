@@ -1,31 +1,59 @@
-// src/pages/DashboardPage.jsx
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 const DashboardPage = () => {
-  const navigate = useNavigate();
+  const [resume, setResume] = useState({
+    fullName: "",
+    role: "",
+    summary: "",
+  });
 
-  const handleLogout = () => {
-    localStorage.removeItem("authToken");
-    navigate("/login");
+  const handleChange = (e) => {
+    setResume({ ...resume, [e.target.name]: e.target.value });
+  };
+
+  const handleResumeSubmit = (e) => {
+    e.preventDefault();
+    console.log("Resume Submitted:", resume);
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Navbar */}
-      <nav className="bg-white shadow-md py-4 px-8 flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-blue-600">Resume Builder</h1>
+    <div className="p-6">
+      <h2 className="text-2xl font-semibold mb-4">📝 Resume Details</h2>
+      <form onSubmit={handleResumeSubmit} className="space-y-4 max-w-md">
+        <input
+          name="fullName"
+          placeholder="Full Name"
+          value={resume.fullName}
+          onChange={handleChange}
+          className="w-full px-4 py-2 border rounded"
+        />
+        <input
+          name="role"
+          placeholder="Your Role (e.g., Web Developer)"
+          value={resume.role}
+          onChange={handleChange}
+          className="w-full px-4 py-2 border rounded"
+        />
+        <textarea
+          name="summary"
+          placeholder="Professional Summary"
+          value={resume.summary}
+          onChange={handleChange}
+          className="w-full px-4 py-2 border rounded"
+        ></textarea>
         <button
-          onClick={handleLogout}
-          className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+          type="submit"
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
         >
-          Logout
+          Save Resume
         </button>
-      </nav>
+      </form>
 
-      {/* Dashboard Content */}
-      <div className="p-8">
-        <h2 className="text-3xl font-semibold mb-2">🏠 Dashboard</h2>
-        <p className="text-gray-600">Welcome to your resume builder dashboard!</p>
+      {/* Preview */}
+      <div className="mt-6 p-4 border rounded shadow-md">
+        <h3 className="text-xl font-bold">{resume.fullName}</h3>
+        <p className="text-blue-500 font-semibold">{resume.role}</p>
+        <p className="mt-2">{resume.summary}</p>
       </div>
     </div>
   );
