@@ -3,3 +3,24 @@
 .input {
   @apply w-full border border-gray-300 rounded px-3 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500;
 }
+.input {
+  @apply w-full border p-2 rounded-md outline-none focus:ring-2 focus:ring-blue-500;
+}
+
+.btn-primary {
+  @apply bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition;
+}
+.classic-template {
+  font-family: 'Arial', sans-serif;
+  border: 2px solid #333;
+}
+
+.professional-template {
+  font-family: 'Times New Roman', serif;
+  border: 2px solid #007BFF;
+}
+
+.modern-template {
+  font-family: 'Helvetica', sans-serif;
+  border: 2px solid #FF5733;
+}

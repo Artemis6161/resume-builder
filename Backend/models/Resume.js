@@ -6,32 +6,21 @@ const resumeSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
-  fullName: String,
+  name: String,
+  title: {
+    type: String,
+    required: true,
+  },
+  profession: {
+    type: String,
+    required: true,
+  },
   email: String,
   phone: String,
   summary: String,
-  education: [
-    {
-      degree: String,
-      institution: String,
-      startYear: String,
-      endYear: String,
-    },
-  ],
-  experience: [
-    {
-      jobTitle: String,
-      company: String,
-      startDate: String,
-      endDate: String,
-      description: String,
-    },
-  ],
+  education: [Object], // or a proper schema if needed
+  experience: [Object],
   skills: [String],
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-});
+}, { timestamps: true });
 
 module.exports = mongoose.model("Resume", resumeSchema);

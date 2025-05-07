@@ -20,7 +20,7 @@ const LoginForm = () => {
       localStorage.setItem("user", JSON.stringify(res.data.user));
 
       // ✅ Redirect after login
-      navigate("/dashboard");
+      navigate("/resume-home");
     } catch (err) {
       alert("❌ Error: " + err.response?.data?.msg || "Login failed");
     }
