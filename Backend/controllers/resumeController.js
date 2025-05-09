@@ -44,6 +44,14 @@ exports.createResume = async (req, res) => {
   }
 };
 
+exports.getAllResumes = async (req, res) => {
+  try {
+    const resumes = await Resume.find({ user: req.user.id }).sort({ createdAt: -1 });
+    res.status(200).json({ resumes });
+  } catch (err) {
+    res.status(500).json({ msg: err.message });
+  }
+};
 
 
 

@@ -7,11 +7,13 @@ const {
   updateResume,
   deleteResume,
   getSingleResume,
+  getAllResumes,
 } = require("../controllers/resumeController");
 
 // Create a resume
 router.post("/", auth, createResume);
-
+// GET all resumes for logged-in user
+router.get('/', auth, getAllResumes);
 // Get a resume by ID (with ownership check)
 router.get("/:id", auth, getSingleResume);
 
