@@ -11,5 +11,5 @@ router.get('/test', (req, res) => res.send('Working'));
 
 router.post('/enhance', auth, enhanceResume);
 router.get('/enhance', auth, getEnhancedResume);
-
+router.post('/test-enhance', enhanceResume);
 module.exports = router;

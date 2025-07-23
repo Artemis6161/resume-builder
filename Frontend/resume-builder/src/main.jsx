@@ -1,3 +1,4 @@
+import global from 'global';
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './app.css'

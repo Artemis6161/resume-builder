@@ -2,39 +2,56 @@ const User = require('../models/User');
 const fetch = require('node-fetch');
 
 // Enhance resume using AI (DeepInfra API)
-const enhanceResume = async (req, res) => {
+const axios = require('axios');
+
+ const enhanceResume = async (req, res) => {
+  const prompt = req.body.prompt;
+  const apiKey = process.env.DEEPINFRA_API_KEY;
+
+  console.log("Prompt received:", prompt);
+  console.log("Using API Key:", apiKey ? "Yes" : "No");
+
+  if (!prompt) {
+    return res.status(400).json({ error: 'Prompt is required' });
+  }
+
   try {
-    const { text } = req.body;
-    const userId = req.user.id;
-
-    const response = await fetch("https://api.deepinfra.com/v1/inference/meta-llama/Meta-Llama-3-8B-Instruct", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.DEEPINFRA_API_KEY}`,
+const response = await axios.post(
+  'https://api.deepinfra.com/v1/openai/chat/completions',
+  {
+    model: 'mistralai/Mixtral-8x7B-Instruct-v0.1',
+    messages: [
+      {
+        role: 'user',
+        content: prompt,
       },
-      body: JSON.stringify({
-        input: text,
-      }),
-    });
+    ],
+  },
+  {
+    headers: {
+      Authorization: `Bearer ${process.env.DEEPINFRA_API_KEY}`,
+      'Content-Type': 'application/json',
+    },
+  }
+);
 
-    const data = await response.json();
-    console.log('DeepInfra Response:', data);
 
-    const enhancedText = data.results?.[0]?.generated_text || "AI failed to enhance resume";
+    console.log("DeepInfra response:", response.data);
 
-    const user = await User.findById(userId);
-    if (user) {
-      user.enhancedResume = enhancedText;
-      await user.save();
+    const aiMessage = response.data?.choices?.[0]?.message?.content;
+
+    if (!aiMessage) {
+      return res.status(500).json({ enhancedResume: 'AI returned no content' });
     }
 
-    res.status(200).json({ enhancedResume: enhancedText });
-  } catch (err) {
-    console.error('AI Error:', err);
-    res.status(500).json({ error: 'Something went wrong while enhancing resume.' });
+    return res.json({ enhancedResume: aiMessage });
+
+  } catch (error) {
+    console.error("DeepInfra Error:", error.response?.data || error.message);
+    return res.status(500).json({ enhancedResume: 'AI failed to enhance resume' });
   }
 };
+
 
 // Get the stored enhanced resume
 const getEnhancedResume = async (req, res) => {

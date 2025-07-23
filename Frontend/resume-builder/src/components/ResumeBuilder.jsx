@@ -146,13 +146,13 @@
 //             value={formData.heading}
 //             onChange={(e) => handleInputChange(e, "heading")}
 //           />
-//           <input
-//             type="email"
-//             className="w-full p-2 border border-gray-300 rounded-md"
-//             placeholder="Email"
-//             value={formData.email}
-//             onChange={(e) => handleInputChange(e, "email")}
-//           />
+        //   <input
+        //     type="email"
+        //     className="w-full p-2 border border-gray-300 rounded-md"
+        //     placeholder="Email"
+        //     value={formData.email}
+        //     onChange={(e) => handleInputChange(e, "email")}
+        //   />
 //           <input
 //             type="number"
 //             className="w-full p-2 border border-gray-300 rounded-md"
@@ -369,8 +369,8 @@
 //   <div className="border-b-2 pb-4">
 //     <div className="text-xl font-bold">{formData.heading}</div>
 //     <div>{formData.summary}</div>
-//     <div>{formData.email}</div>
-//     <div>{formData.phone}</div>
+    // <div>{formData.email}</div>
+    // <div>{formData.phone}</div>
 
 //     {/* LinkedIn, GitHub, Portfolio with only the username */}
 //     {formData.linkedIn && (

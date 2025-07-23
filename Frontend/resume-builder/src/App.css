@@ -24,3 +24,35 @@
   font-family: 'Helvetica', sans-serif;
   border: 2px solid #FF5733;
 }
+/* Add this to your global CSS */
+#resume-preview a, 
+#resume-preview .technology-list {
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Ensure form doesn't overlap */
+.form-section {
+  position: relative;
+  z-index: 1;
+}
+
+.pdf-section {
+  position: relative;
+  z-index: 0;
+}
+.btn-primary {
+  @apply bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded shadow transition;
+}
+.btn-secondary {
+  @apply bg-gray-500 hover:bg-gray-600 text-white font-semibold px-4 py-2 rounded shadow transition;
+}
+.btn-success {
+  @apply bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded shadow transition;
+}
+.btn-warning {
+  @apply bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-4 py-2 rounded shadow transition;
+}
+.btn-danger {
+  @apply bg-red-500 hover:bg-red-600 text-white font-semibold px-4 py-2 rounded shadow transition;
+}

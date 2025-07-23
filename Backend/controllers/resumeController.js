@@ -57,44 +57,47 @@ exports.getAllResumes = async (req, res) => {
 
 exports.getResumeById = async (req, res) => {
   try {
+    console.log("Fetching resume ID:", req.params.id);
+    console.log("For user:", req.user.id);
+
     const resume = await Resume.findOne({ _id: req.params.id, user: req.user.id });
 
-    if (!resume) return res.status(404).json({ msg: "Resume not found" });
-
-    res.json(resume);
-  } catch (err) {
-    res.status(500).json({ msg: err.message });
-  }
-};
-exports.getSingleResume = async (req, res) => {
-  try {
-    const resume = await Resume.findById(req.params.id);
-    console.log('Saved resume:', resume);
-    if (!resume || resume.user.toString() !== req.user.id) {
-      return res.status(404).json({ message: "Resume not found" });
+    if (!resume) {
+      console.log("Resume not found.");
+      return res.status(404).json({ message: 'Resume not found' });
     }
 
     res.status(200).json(resume);
-  } catch (error) {
-    res.status(500).json({ message: "Failed to fetch resume", error });
+  } catch (err) {
+    console.error("Error fetching resume:", err);
+    res.status(500).json({ message: err.message });
   }
 };
-
 exports.updateResume = async (req, res) => {
   try {
-    const updatedResume = await Resume.findOneAndUpdate(
-      { _id: req.params.id, user: req.user.id },
-      req.body,
-      { new: true }
-    );
+    const { id } = req.params;
+    const updatedData = req.body;
 
-    if (!updatedResume) return res.status(404).json({ msg: "Resume not found" });
+    const resume = await Resume.findById(id);
+    if (!resume) {
+      return res.status(404).json({ message: 'Resume not found' });
+    }
+
+    // Merge and save
+    Object.assign(resume, updatedData);
+    const updatedResume = await resume.save();
 
     res.json(updatedResume);
-  } catch (err) {
-    res.status(500).json({ msg: err.message });
+  } catch (error) {
+    console.error('Error updating resume:', error.message);
+    res.status(500).json({ message: 'Server error while updating resume' });
   }
 };
+
+
+
+
+
 
 exports.deleteResume = async (req, res) => {
   try {
@@ -107,3 +110,6 @@ exports.deleteResume = async (req, res) => {
     res.status(500).json({ msg: err.message });
   }
 };
+
+
+
