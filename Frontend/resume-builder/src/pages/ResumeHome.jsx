@@ -20,7 +20,7 @@ const ResumeHome = () => {
           return;
         }
 
-        const res = await axios.get('http://localhost:5000/api/resumes', {
+        const res = await axios.get('https://resume-builder-frontend-u8i8.onrender.com/resumes', {
           headers: { Authorization: `Bearer ${token}` },
         });
         setResumes(res.data.resumes || []);
