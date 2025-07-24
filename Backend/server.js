@@ -33,12 +33,11 @@ app.use(express.urlencoded({ extended: true }));
 
 // CORS Configuration
 app.use(cors({
-  origin: FRONTEND_URL,
+  origin: 'https://resume-builder-backend-suc5.onrender.com/',
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
 }));
-
 //               Database Connection
 
 const connectDB = async () => {
