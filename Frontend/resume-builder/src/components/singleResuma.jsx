@@ -17,11 +17,11 @@ import { saveResume, getResumeById } from '../services/resumeApi';
 // import ReactQuill from 'react-quill';
 // import 'react-quill/dist/quill.snow.css';
 const ResumeForm = () => {
-   const { id } = useParams(); 
-     const previewRef = useRef();
-    const resumeRef = useRef();
+   const { id } = useParams();
+   const previewRef = useRef();
+   const resumeRef = useRef();
   const [step, setStep] = useState(0);
-   
+
   const [currentSuggestion, setCurrentSuggestion] = useState();
   const [loadingSuggestion, setLoadingSuggestion] = useState(false);
    const [saving, setSaving] = useState(false);
@@ -34,6 +34,7 @@ const ResumeForm = () => {
   linkedin: '',
   github: '',
   portfolio: '',
+  location:'',
   education: [{ degree: '', institution: '', from: '', to: '', currentlyStudying: false }],
   skills: [''],
   experience: [{ company: '', role: '', from: '', to: '', currentlyWorking: false, description: '' }],
@@ -74,6 +75,7 @@ const initialResumeState = {
   linkedin: '',
   github: '',
   portfolio: '',
+   location:'',
   education: [{ degree: '', institution: '', from: '', to: '', currentlyStudying: false }],
   skills: [''],
   experience: [{ company: '', role: '', from: '', to: '', currentlyWorking: false, summary: '' }],
@@ -100,13 +102,12 @@ const initialResumeState = {
   projects: loadedResume.projects?.length ? loadedResume.projects : [{ title: '', link: '', description: '', from: '', to: '', technology: '' }],
   certifications: loadedResume.certifications?.length ? loadedResume.certifications : [''],
   languages: loadedResume.languages?.length ? loadedResume.languages : [''],
+
 });
 
 
-
-      
-      // Initialize editors
-      const newEditorStates = loadedResume.experience.map(exp => {
+      // Initialize experience editors
+      const newExperienceEditorStates = loadedResume.experience.map(exp => {
         if (exp.summary) {
           const blocks = convertFromHTML(exp.summary);
           const contentState = ContentState.createFromBlockArray(
@@ -117,9 +118,22 @@ const initialResumeState = {
         }
         return EditorState.createEmpty();
       });
-      setEditorStates(newEditorStates);
-      
-      // Same for projects...
+      setEditorStates(newExperienceEditorStates);
+
+      // Initialize project editors (THIS WAS MISSING)
+      const newProjectEditorStates = loadedResume.projects.map(proj => {
+        if (proj.description) {
+          const blocks = convertFromHTML(proj.description);
+          const contentState = ContentState.createFromBlockArray(
+            blocks.contentBlocks,
+            blocks.entityMap
+          );
+          return EditorState.createWithContent(contentState);
+        }
+        return EditorState.createEmpty();
+      });
+      setProjectEditorStates(newProjectEditorStates);
+
     } catch (error) {
       console.error('Load error:', error);
     }
@@ -145,7 +159,7 @@ const handleSaveResume = async () => {
   try {
     setSaving(true);
 
-    // Convert editor states to HTML and update resume.experience summaries
+    // Convert experience editor states to HTML and update resume.experience summaries
   const updatedExperience = resume.experience.map((exp, index) => {
   const state = editorStates[index];
   if (!state) return exp; // Skip if undefined
@@ -155,14 +169,23 @@ const handleSaveResume = async () => {
   return { ...exp, summary: htmlContent };
 });
 
+    // Convert project editor states to HTML and update resume.projects descriptions
+    const updatedProjects = resume.projects.map((proj, index) => {
+      const state = projectEditorStates[index];
+      if (!state) return proj; // Skip if undefined
 
-    const updatedResume = { ...resume, experience: updatedExperience };
+      const rawContent = convertToRaw(state.getCurrentContent());
+      const htmlContent = draftToHtml(rawContent);
+      return { ...proj, description: htmlContent };
+    });
 
+
+    const updatedResume = { ...resume, experience: updatedExperience, projects: updatedProjects }; // Include updatedProjects
     const savedResume = await saveResume(updatedResume, token);
     setResume(savedResume);
 
-    // Rebuild editor states from saved summaries
-    const newEditorStates = savedResume.experience.map(exp => {
+    // Rebuild experience editor states from saved summaries
+    const newExperienceEditorStates = savedResume.experience.map(exp => {
       if (!exp.summary) return EditorState.createEmpty();
       try {
         const blocks = convertFromHTML(exp.summary);
@@ -175,8 +198,25 @@ const handleSaveResume = async () => {
         return EditorState.createEmpty();
       }
     });
+    setEditorStates(newExperienceEditorStates);
 
-    setEditorStates(newEditorStates);
+    // Rebuild project editor states from saved descriptions (THIS WAS MISSING)
+    const newProjectEditorStates = savedResume.projects.map(proj => {
+      if (!proj.description) return EditorState.createEmpty();
+      try {
+        const blocks = convertFromHTML(proj.description);
+        const contentState = ContentState.createFromBlockArray(
+          blocks.contentBlocks,
+          blocks.entityMap
+        );
+        return EditorState.createWithContent(contentState);
+      } catch (err) {
+        return EditorState.createEmpty();
+      }
+    });
+    setProjectEditorStates(newProjectEditorStates);
+
+
     alert("Saved successfully!");
   } catch (error) {
     console.error("Save failed:", error.message);
@@ -185,13 +225,6 @@ const handleSaveResume = async () => {
     setSaving(false);
   }
 };
-
-
-
-
-
-
-
 
 
 const handleProjectEditorChange = (index, state) => {
@@ -217,7 +250,7 @@ const handleProjectEditorChange = (index, state) => {
 // });
 
 
-// const techs = element.querySelectorAll('.tech-tag, .text-sm'); 
+// const techs = element.querySelectorAll('.tech-tag, .text-sm');
 // techs.forEach(el => {
 //   el.textContent = el.textContent.replace(/[<>]/g, '');
 // });
@@ -292,13 +325,6 @@ const handleDownloadPDF = () => {
 // ...existing code...
 
 
-
-
-
-
-
-
-
 const handleAiSuggestionChange = (section, index, value) => {
   setResume(prev => ({
     ...prev,
@@ -311,7 +337,6 @@ const handleAiSuggestionChange = (section, index, value) => {
     }
   }));
 };
-
 
 
   const getAISuggestion = async (promptText,section, index = null, field = null) => {
@@ -340,7 +365,7 @@ console.log("resume[section]:", resume[section]);
       body: JSON.stringify({ prompt: promptText })
     });
 
-     const data = await response.json();
+      const data = await response.json();
     console.log("AI Suggestion:", data);
 
     const suggestion = data.enhancedResume || data.result || '';
@@ -379,10 +404,8 @@ if (section === 'projects' && field === 'description') {
 
 else if (section === 'summary'&& !index && !field) {
   setResume(prev => ({ ...prev, summary: suggestion }));
-   return;
+    return;
 }
-
-
 
   } catch (error) {
     console.error('Error fetching AI suggestion:', error.message);
@@ -405,8 +428,6 @@ const addExperience = () => {
 };
 
 
-
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setResume({ ...resume, [name]: value });
@@ -423,7 +444,7 @@ const addExperience = () => {
     updated[index][field] = value;
     setResume({ ...resume, experience: updated });
   };
- 
+
 
   const toggleCurrent = (index) => {
     const updated = [...resume.experience];
@@ -459,7 +480,7 @@ const addExperience = () => {
   };
 
 
- const deleteField = (section, index) => {
+  const deleteField = (section, index) => {
   if (!window.confirm(`Delete this ${section} entry?`)) return;
 
   const updated = [...resume[section]];
@@ -484,14 +505,14 @@ const addExperience = () => {
 // Suggestion Button — improved with loading logic
 const SuggestBtn = ({ prompt, section, index = null, field = null }) => {
   const isCurrent = currentSuggestion === `${section}-${index}-${field}`;
-  
+
   return (
     <button
       type="button"
       onClick={() => getAISuggestion(prompt, section, index, field)}
       className={`ml-2 px-3 py-1 text-sm rounded border transition ${
-        isCurrent && loadingSuggestion 
-          ? 'bg-gray-300 border-gray-400 text-gray-600' 
+        isCurrent && loadingSuggestion
+          ? 'bg-gray-300 border-gray-400 text-gray-600'
           : 'bg-blue-50 border-blue-200 text-blue-600 hover:bg-blue-100'
       }`}
       disabled={loadingSuggestion && isCurrent}
@@ -507,11 +528,11 @@ const SuggestBtn = ({ prompt, section, index = null, field = null }) => {
   );
 };
 
-  
+
   const formSections = [
-    
+
     // SECTION 0: Basic Info
-    
+
     <>
       <input name="title" placeholder="Full Name" value={resume.title} onChange={handleChange} className="input" />
       <input name="profession" placeholder="Profession" value={resume.profession} onChange={handleChange} className="input" />
@@ -522,7 +543,7 @@ const SuggestBtn = ({ prompt, section, index = null, field = null }) => {
       <input name="linkedin" placeholder="LinkedIn" value={resume.linkedin} onChange={handleChange} className="input" />
       <input name="github" placeholder="GitHub" value={resume.github} onChange={handleChange} className="input" />
       <input name="portfolio" placeholder="Portfolio" value={resume.portfolio} onChange={handleChange} className="input" />
-    
+      <input name="location" placeholder="location" value={resume.location} onChange={handleChange} className="input" />
     </>,
 
     // SECTION 1: Education
@@ -547,12 +568,11 @@ const SuggestBtn = ({ prompt, section, index = null, field = null }) => {
       Currently Studying
     </label>
     <button type="button" onClick={() => addEntry('education', { degree: '', institution: '', from: '', to: '', currentlyStudying: false })}  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg shadow transition">Add Education</button>
-     <button type="button" onClick={() => deleteField('education', resume.education.length - 1)}  className="bg-red-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg shadow transition">Delete</button>
+      <button type="button" onClick={() => deleteField('education', resume.education.length - 1)}  className="bg-red-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg shadow transition">Delete</button>
   </div>
 ))}
 
-      
-    
+
     </>,
 
     // SECTION 2: Skills
@@ -562,7 +582,7 @@ const SuggestBtn = ({ prompt, section, index = null, field = null }) => {
     //     <input key={index} placeholder="Skill" value={skill} onChange={(e) => handleListChange(e, index, 'skills')} className="input" />
     //   ))}
     //   <button type="button" onClick={() => addEntry('skills', '')}  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg shadow transition">Add Skill</button>
-    //    <button type="button" onClick={() => deleteField('skills', resume.skills.length - 1)}  className="bg-red-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg shadow transition">Delete</button>
+    //     <button type="button" onClick={() => deleteField('skills', resume.skills.length - 1)}  className="bg-red-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg shadow transition">Delete</button>
     // </>,
     <>
   <label className="font-bold">Skills</label>
@@ -580,7 +600,7 @@ const SuggestBtn = ({ prompt, section, index = null, field = null }) => {
 
 
     // SECTION 3: Experience
-  
+
     <>
   <label className="font-bold">Experience</label>
   {resume.experience.map((exp, i) => (
@@ -623,7 +643,7 @@ const SuggestBtn = ({ prompt, section, index = null, field = null }) => {
       </label>
 
   <Editor
-   
+
     editorState={editorStates[i] || EditorState.createEmpty()}
     onEditorStateChange={(state) => handleEditorChange(i, state)}
     wrapperClassName="border rounded p-2"
@@ -632,7 +652,6 @@ const SuggestBtn = ({ prompt, section, index = null, field = null }) => {
   />
 
 
-      
       <SuggestBtn
         prompt={`Write a resume description for a ${exp.role} at ${exp.company}.`}
         section="experience"
@@ -640,86 +659,81 @@ const SuggestBtn = ({ prompt, section, index = null, field = null }) => {
         field="summary"
       />
 
-     
-   
 
 </div>
   ))}
-   
+
              <button type="button"
-       onClick={addExperience}
-       className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg shadow transition">Add Experience</button>
-        <button
-          type="button"
-          onClick={() => deleteField('experience', resume.experience.length - 1)}
-          className="bg-red-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg shadow transition"
-        >
-          Delete
-        </button>
-         
-    
+        onClick={addExperience}
+        className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg shadow transition">Add Experience</button>
+         <button
+           type="button"
+           onClick={() => deleteField('experience', resume.experience.length - 1)}
+           className="bg-red-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg shadow transition"
+         >
+           Delete
+         </button>
+
 </>,
 
 // SECTION 5: Projects
 
 <>
   <label className="font-bold">Projects</label>
-  
+
     {resume.projects.map((proj, index) => (
      <div className="space-y-1 border-b pb-3 mb-3">
-        
-          <input
-            placeholder="Project Title*"
-            value={proj.title}
-            onChange={(e) => handleArrayChange(e, index, 'title', 'projects')}
-            className="input"
-            required
-          />
-          <input
-            placeholder="Project Link "
-            value={proj.link}
-            onChange={(e) => handleArrayChange(e, index, 'link', 'projects')}
-            className="input"
-            required
-          />
-            <input
-          placeholder="Technologies Used (e.g., React, Node.js)"
-          value={proj.technology || ''}
-          onChange={(e) => handleArrayChange(e, index, 'technology', 'projects')}
-          className="input mb-3"
-          required
-        />
-       
 
-      
+           <input
+             placeholder="Project Title*"
+             value={proj.title}
+             onChange={(e) => handleArrayChange(e, index, 'title', 'projects')}
+             className="input"
+             required
+           />
+           <input
+             placeholder="Project Link "
+             value={proj.link}
+             onChange={(e) => handleArrayChange(e, index, 'link', 'projects')}
+             className="input"
+             required
+           />
+             <input
+           placeholder="Technologies Used (e.g., React, Node.js)"
+           value={proj.technology || ''}
+           onChange={(e) => handleArrayChange(e, index, 'technology', 'projects')}
+           className="input mb-3"
+           required
+         />
 
-        <div className="mb-3">
-          <label className="block text-sm font-medium mb-1">Description*</label>
-          <Editor
-            editorState={projectEditorStates[index] || EditorState.createEmpty()}
-            onEditorStateChange={(state) => handleProjectEditorChange(index, state)}
-            wrapperClassName="border rounded p-2"
-            editorClassName="min-h-[150px] bg-white p-2"
-            toolbarClassName="bg-gray-100"
-          />
-        </div>
 
-        
-          <SuggestBtn
-            prompt="Improve this project description for a resume."
-            section="projects"
-            index={index}
-            field="description"
-          />
-          <button
-            type="button"
-            onClick={() => deleteField('projects', index)}
-            className="text-red-600 hover:text-red-800 text-sm font-medium"
-          >
-            Remove Project
-          </button>
-        </div>
-   
+         <div className="mb-3">
+           <label className="block text-sm font-medium mb-1">Description*</label>
+           <Editor
+             editorState={projectEditorStates[index] || EditorState.createEmpty()}
+             onEditorStateChange={(state) => handleProjectEditorChange(index, state)}
+             wrapperClassName="border rounded p-2"
+             editorClassName="min-h-[150px] bg-white p-2"
+             toolbarClassName="bg-gray-100"
+           />
+         </div>
+
+
+           <SuggestBtn
+             prompt="Improve this project description for a resume."
+             section="projects"
+             index={index}
+             field="description"
+           />
+           <button
+             type="button"
+             onClick={() => deleteField('projects', index)}
+             className="text-red-600 hover:text-red-800 text-sm font-medium"
+           >
+             Remove Project
+           </button>
+         </div>
+
     ))}
 
 
@@ -785,16 +799,14 @@ const SuggestBtn = ({ prompt, section, index = null, field = null }) => {
   </button>
 </>
 
-  
 
-    
   ];
   // const nextStep = () => setStep(prev => Math.min(prev + 1, formSections.length - 1));
   // const prevStep = () => setStep(prev => Math.max(prev - 1, 0));
   return (
-  
+
   <div className="flex flex-col md:flex-row gap-6" ref={previewRef} id="resume-preview">
-  
+
     {/* Left side: Form section and navigation */}
 <div className="w-full md:w-1/2 space-y-4">
       {formSections[step]}
@@ -821,7 +833,7 @@ const SuggestBtn = ({ prompt, section, index = null, field = null }) => {
       {/* Final Step Buttons */}
       {step === formSections.length - 1 && (
         <div className="flex gap-4 mt-8">
-         <button
+           <button
   onClick={handleSaveResume}
   disabled={saving}
   className={`bg-green-600 text-white px-4 py-2 rounded ${
@@ -837,8 +849,8 @@ const SuggestBtn = ({ prompt, section, index = null, field = null }) => {
     'Save Resume'
   )}
 </button>
-          
-          <button
+
+           <button
   type="button"
   onClick={() => {
     localStorage.removeItem('resumeDraft');
@@ -849,7 +861,7 @@ const SuggestBtn = ({ prompt, section, index = null, field = null }) => {
 >
   Clear Draft
 </button>
-         
+
         </div>
       )}
     </div>
@@ -865,7 +877,7 @@ const SuggestBtn = ({ prompt, section, index = null, field = null }) => {
   </button>
 </div>
 
-   
+
   </div>
 );
 

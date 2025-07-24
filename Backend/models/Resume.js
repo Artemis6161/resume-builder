@@ -12,6 +12,7 @@ const resumeSchema = new mongoose.Schema({
   linkedin: String,
   github: String,
   portfolio: String,
+   location: String,
   education: [
     {
       degree: String,

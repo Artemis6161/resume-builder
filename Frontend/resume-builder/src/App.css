@@ -56,3 +56,13 @@
 .btn-danger {
   @apply bg-red-500 hover:bg-red-600 text-white font-semibold px-4 py-2 rounded shadow transition;
 }
+@media print {
+  #resume-preview {
+    page-break-inside: avoid;
+    page-break-after: auto;
+  }
+}
+
+
+
+
