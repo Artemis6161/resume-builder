@@ -20,7 +20,7 @@ const ResumeHome = () => {
           return;
         }
 
-        const res = await axios.get('https://resume-builder-frontend-u8i8.onrender.com/resumes', {
+        const res = await axios.get('https://resume-builder-frontend-u8i8.onrender.com/api/resumes', {
           headers: { Authorization: `Bearer ${token}` },
         });
         setResumes(res.data.resumes || []);
@@ -47,7 +47,7 @@ const handleCreateResume = async (title) => {
     localStorage.removeItem('resumeDraft');
     
     const res = await axios.post(
-      'https://resume-builder-frontend-u8i8.onrender.com/resumes',
+      'https://resume-builder-frontend-u8i8.onrender.com/api/resumes',
       {
         title,
         profession: 'Developer',
@@ -76,7 +76,7 @@ const handleCreateResume = async (title) => {
     e.stopPropagation();
     try {
       const token = localStorage.getItem('authToken');
-      await axios.delete(`https://resume-builder-frontend-u8i8.onrender.com/resumes/${resumeId}`, {
+      await axios.delete(`https://resume-builder-frontend-u8i8.onrender.com/api/resumes/${resumeId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setResumes(prev => prev.filter(r => r._id !== resumeId));
