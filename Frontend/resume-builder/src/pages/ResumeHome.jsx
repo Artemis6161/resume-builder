@@ -76,7 +76,7 @@ const handleCreateResume = async (title) => {
     e.stopPropagation();
     try {
       const token = localStorage.getItem('authToken');
-      await axios.delete(`http://localhost:5000/api/resumes/${resumeId}`, {
+      await axios.delete(`https://resume-builder-frontend-u8i8.onrender.com/resumes/${resumeId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setResumes(prev => prev.filter(r => r._id !== resumeId));
