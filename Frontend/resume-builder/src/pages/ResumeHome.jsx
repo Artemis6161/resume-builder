@@ -47,7 +47,7 @@ const handleCreateResume = async (title) => {
     localStorage.removeItem('resumeDraft');
     
     const res = await axios.post(
-      'http://localhost:5000/api/resumes',
+      'https://resume-builder-frontend-u8i8.onrender.com/resumes',
       {
         title,
         profession: 'Developer',
