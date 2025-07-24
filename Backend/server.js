@@ -80,10 +80,10 @@ const connectDB = async () => {
 
 
 //                  Routes
-// app.get('/', (req, res) => {
-//   res.send('API is running...');
-// });
-// Health check endpoint
+app.get('/', (req, res) => {
+  res.send('API is running...');
+});
+Health check endpoint
 app.get('/api/health', (req, res) => {
   res.status(200).json({
     status: 'healthy',
