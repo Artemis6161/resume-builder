@@ -3,6 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import CreateResumeModal from '../components/CreateResumeModal';
 import axios from 'axios';
 
+// Define your backend API base URL here
+// It's best practice to use an environment variable for this
+// For now, we'll hardcode it for demonstration, but ideally, you'd use:
+// const API_BASE_URL = import.meta.env.VITE_APP_BACKEND_URL; // if using Vite and .env
+// or process.env.REACT_APP_BACKEND_URL; // if using Create React App and .env
+
+const API_BASE_URL = 'https://resume-builder-backend-suc5.onrender.com'; // <--- CORRECTED BACKEND URL
+
 const ResumeHome = () => {
   const [resumes, setResumes] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
@@ -20,7 +28,8 @@ const ResumeHome = () => {
           return;
         }
 
-        const res = await axios.get('https://resume-builder-frontend-u8i8.onrender.com/api/resumes', {
+        // CORRECTED API CALL: Use API_BASE_URL + /api/resumes
+        const res = await axios.get(`${API_BASE_URL}/api/resumes`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setResumes(res.data.resumes || []);
@@ -42,12 +51,13 @@ const ResumeHome = () => {
 const handleCreateResume = async (title) => {
   try {
     const token = localStorage.getItem('authToken');
-    
+
     // Clear any existing draft before creating new resume
     localStorage.removeItem('resumeDraft');
-    
+
+    // CORRECTED API CALL: Use API_BASE_URL + /api/resumes
     const res = await axios.post(
-      'https://resume-builder-frontend-u8i8.onrender.com/api/resumes',
+      `${API_BASE_URL}/api/resumes`,
       {
         title,
         profession: 'Developer',
@@ -62,7 +72,7 @@ const handleCreateResume = async (title) => {
         headers: { Authorization: `Bearer ${token}` },
       }
     );
-    
+
     setResumes(prev => [...prev, res.data]);
     navigate(`/resumes/${res.data._id}`);
     setModalOpen(false);
@@ -76,7 +86,8 @@ const handleCreateResume = async (title) => {
     e.stopPropagation();
     try {
       const token = localStorage.getItem('authToken');
-      await axios.delete(`https://resume-builder-frontend-u8i8.onrender.com/api/resumes/${resumeId}`, {
+      // CORRECTED API CALL: Use API_BASE_URL + /api/resumes/:id
+      await axios.delete(`${API_BASE_URL}/api/resumes/${resumeId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setResumes(prev => prev.filter(r => r._id !== resumeId));
@@ -104,7 +115,7 @@ const handleCreateResume = async (title) => {
       <div className="p-6">
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
           {error}
-          <button 
+          <button
             onClick={() => setError(null)}
             className="absolute top-0 right-0 px-2 py-1"
           >
