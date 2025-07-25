@@ -23,6 +23,7 @@ const ResumeHome = () => {
       try {
         setLoading(true);
         const token = localStorage.getItem('authToken');
+        console.log("Sending token:", token);
         if (!token) {
           navigate('/login');
           return;
