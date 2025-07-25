@@ -12,7 +12,7 @@ const RegisterForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("https://resume-builder-backend-suc5.onrender.com/api/auth/login", formData);
+      const res = await axios.post("https://resume-builder-backend-suc5.onrender.com/api/auth/register", formData);
       alert("✅ Registered successfully");
       
   
