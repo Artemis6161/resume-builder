@@ -18,26 +18,28 @@ const ResumeHome = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
- useEffect(() => {
+useEffect(() => {
   const fetchResumes = async () => {
+    setLoading(true); // Start loading
     try {
-      const token = localStorage.getItem("authToken");
-      const res = await axios.get(
-        "https://resume-builder-backend-suc5.onrender.com/api/resumes",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      setResumes(res.data); // or whatever you're doing with the response
+      const token = localStorage.getItem("token");
+      const res = await axios.get("https://resume-builder-backend-suc5.onrender.com/api/resumes", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setResumes(res.data);
     } catch (err) {
-      alert("❌ Fetch failed: " + err.response?.data?.msg || "Unauthorized");
+      console.error("Failed to fetch resumes:", err.response || err);
+    } finally {
+      setLoading(false); // Stop loading no matter what
     }
   };
 
   fetchResumes();
 }, []);
+
+
 
 
 const handleCreateResume = async (title) => {
