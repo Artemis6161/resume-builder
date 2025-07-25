@@ -9,22 +9,24 @@ const LoginForm = () => {
   const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const res = await axios.post("https://resume-builder-backend-suc5.onrender.com/api/auth/login", formData);
-      alert("✅ Logged in");
-      
-      // ✅ Save token and user
-      localStorage.setItem("authToken", res.data.token); // use consistent key: "authToken"
-      localStorage.setItem("user", JSON.stringify(res.data.user));
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  try {
+    const res = await axios.post(
+      "https://resume-builder-backend-suc5.onrender.com/api/auth/login",
+      formData,
+      { headers: { "Content-Type": "application/json" } }
+    );
+    
+    alert("✅ Logged in");
+    localStorage.setItem("authToken", res.data.token);
+    localStorage.setItem("user", JSON.stringify(res.data.user));
+    navigate("/resume-home");
+  } catch (err) {
+    alert("❌ Error: " + (err.response?.data?.message || "Login failed"));
+  }
+};
 
-      // ✅ Redirect after login
-      navigate("/resume-home");
-    } catch (err) {
-      alert("❌ Error: " + err.response?.data?.msg || "Login failed");
-    }
-  };
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
