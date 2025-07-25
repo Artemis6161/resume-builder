@@ -18,29 +18,44 @@ const ResumeHome = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-useEffect(() => {
-  const fetchResumes = async () => {
-    setLoading(true); // Start loading
-    try {
-      const token = localStorage.getItem("token");
-      const res = await axios.get("https://resume-builder-backend-suc5.onrender.com/api/resumes", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setResumes(res.data);
-    } catch (err) {
-      console.error("Failed to fetch resumes:", err.response || err);
-    } finally {
-      setLoading(false); // Stop loading no matter what
-    }
-  };
+  useEffect(() => {
+    const fetchResumes = async () => {
+      try {
+        setLoading(true);
+        const token = localStorage.getItem('authToken');
+        console.log("Sending token:", token);
+        if (!token) {
+          navigate('/login');
+          return;
+        }
 
-  fetchResumes();
-}, []);
+        // CORRECTED API CALL: Use API_BASE_URL + /api/resumes
 
 
+const res = await axios.get(
+  "https://resume-builder-backend-suc5.onrender.com/api/resumes",
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }
+);
 
+        setResumes(res.data.resumes || []);
+      } catch (err) {
+        console.error('Error fetching resumes:', err);
+        setError(err.response?.data?.message || 'Failed to fetch resumes');
+        if (err.response?.status === 401) {
+          localStorage.removeItem('authToken');
+          navigate('/login');
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchResumes();
+  }, [navigate]);
 
 const handleCreateResume = async (title) => {
   try {
