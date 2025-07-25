@@ -18,36 +18,27 @@ const ResumeHome = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchResumes = async () => {
-      try {
-        setLoading(true);
-        const token = localStorage.getItem('authToken');
-        console.log("Sending token:", token);
-        if (!token) {
-          navigate('/login');
-          return;
+ useEffect(() => {
+  const fetchResumes = async () => {
+    try {
+      const token = localStorage.getItem("authToken");
+      const res = await axios.get(
+        "https://resume-builder-backend-suc5.onrender.com/api/resumes",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
+      );
+      setResumes(res.data); // or whatever you're doing with the response
+    } catch (err) {
+      alert("❌ Fetch failed: " + err.response?.data?.msg || "Unauthorized");
+    }
+  };
 
-        // CORRECTED API CALL: Use API_BASE_URL + /api/resumes
-        const res = await axios.get(`${API_BASE_URL}/api/resumes`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setResumes(res.data.resumes || []);
-      } catch (err) {
-        console.error('Error fetching resumes:', err);
-        setError(err.response?.data?.message || 'Failed to fetch resumes');
-        if (err.response?.status === 401) {
-          localStorage.removeItem('authToken');
-          navigate('/login');
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
+  fetchResumes();
+}, []);
 
-    fetchResumes();
-  }, [navigate]);
 
 const handleCreateResume = async (title) => {
   try {
