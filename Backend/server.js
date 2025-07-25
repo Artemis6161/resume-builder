@@ -32,12 +32,15 @@ app.use(express.json({ limit: '10kb' })); // Body parser
 app.use(express.urlencoded({ extended: true }));
 
 // CORS Configuration
-app.use(cors({
-  origin: 'https://resume-builder-backend-suc5.onrender.com',
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
-}));
+
+
+const corsOptions = {
+  origin: 'https://resume-builder-frontend-u8i8.onrender.com', // <-- correct frontend URL
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
+
 //               Database Connection
 
 const connectDB = async () => {
