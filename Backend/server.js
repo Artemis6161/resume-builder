@@ -35,7 +35,7 @@ app.use(express.urlencoded({ extended: true }));
 
 
 const corsOptions = {
-  origin: 'https://resume-builder-frontend-u8i8.onrender.com', // <-- correct frontend URL
+   origin: FRONTEND_URL, // <-- correct frontend URL
   credentials: true,
 };
 
