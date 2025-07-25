@@ -10,8 +10,8 @@ import draftToHtml from 'draftjs-to-html';
 import Spinner from '../components/Spinner';
 import { useParams } from 'react-router-dom';
 import { convertFromHTML } from 'draft-js';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { toast } from 'react-toastify';
+// import 'react-toastify/dist/ReactToastify.css';
 import { saveResume, getResumeById } from '../services/resumeApi';
 
 // import ReactQuill from 'react-quill';
@@ -153,6 +153,7 @@ const handleSaveResume = async () => {
   const token = localStorage.getItem('authToken');
   if (!token) {
     console.error("Token missing");
+          toast("Token missing");
     return;
   }
 
@@ -216,11 +217,12 @@ const handleSaveResume = async () => {
     });
     setProjectEditorStates(newProjectEditorStates);
 
-
-    alert("Saved successfully!");
+ toast("Saved successfully!");
+    // alert("Saved successfully!");
   } catch (error) {
     console.error("Save failed:", error.message);
-    alert("Save failed: " + error.message);
+     toast("Save failed: " + error.message);
+    // alert("Save failed: " + error.message);
   } finally {
     setSaving(false);
   }
@@ -300,7 +302,8 @@ const handleDownloadPDF = () => {
   const element = resumeRef.current;
 
   if (!element) {
-    alert("Resume preview not found.");
+   toast("Resume preview not found.");
+    
     return;
   }
 

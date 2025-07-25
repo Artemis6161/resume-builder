@@ -12,7 +12,7 @@ const Navbar = () => {
           {/* <li><Link to="/" className="hover:underline">Home</Link></li> */}
           <li><Link to="/resume-home" className="hover:underline">Dashboard</Link></li>
          
-          <li><Link to="/profile" className="hover:underline">Profile</Link></li>
+          {/* <li><Link to="/profile" className="hover:underline">Profile</Link></li> */}
              
         </ul>
       </div>

@@ -1,5 +1,6 @@
 // src/components/LoginForm.jsx
 import { useState } from "react";
+import { toast } from 'react-toastify';
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
@@ -11,19 +12,23 @@ const LoginForm = () => {
 
 const handleSubmit = async (e) => {
   e.preventDefault();
+   if (!email || !password) {
+      toast("Please enter both email and password");
+      return;
+    }
   try {
     const res = await axios.post(
       "https://resume-builder-backend-suc5.onrender.com/api/auth/login",
       formData,
       { headers: { "Content-Type": "application/json" } }
     );
-    
-    alert("✅ Logged in");
+       toast("✅  Login Successful");
+    // alert("✅ Logged in");
     localStorage.setItem("authToken", res.data.token);
     localStorage.setItem("user", JSON.stringify(res.data.user));
     navigate("/resume-home");
   } catch (err) {
-    alert("❌ Error: " + (err.response?.data?.message || "Login failed"));
+    toast("❌ Error: " + (err.response?.data?.message || "Login failed"));
   }
 };
 

@@ -1,5 +1,6 @@
 // src/components/RegisterForm.jsx
 import { useState } from "react";
+import { toast } from 'react-toastify';
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
@@ -13,13 +14,13 @@ const RegisterForm = () => {
     e.preventDefault();
     try {
       const res = await axios.post("https://resume-builder-backend-suc5.onrender.com/api/auth/register", formData);
-      alert("✅ Registered successfully");
+      // alert("✅ Registered successfully");
       
-  
+  toast("Registered Successful");
         // ✅ Redirect after login
         navigate("/login");
     } catch (err) {
-      alert("❌ Error: " + err.response?.data?.msg || "Registration failed");
+      toast("❌ Error: " + err.response?.data?.msg || "Registration failed");
     }
   };
 
