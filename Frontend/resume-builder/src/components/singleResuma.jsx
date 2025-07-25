@@ -356,7 +356,7 @@ console.log("resume[section]:", resume[section]);
   }
 
   try {
-    const response = await fetch('https://resume-builder-backend-suc5.onrender.com/ai/enhance', {
+    const response = await fetch('https://resume-builder-backend-suc5.onrender.com/api/ai/enhance', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
