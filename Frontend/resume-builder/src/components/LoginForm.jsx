@@ -12,10 +12,11 @@ const LoginForm = () => {
 
 const handleSubmit = async (e) => {
   e.preventDefault();
-   if (!email || !password) {
-      toast("Please enter both email and password");
-      return;
-    }
+  const { email, password } = formData;
+if (!email || !password) {
+  toast("Please enter both email and password");
+  return;
+}
   try {
     const res = await axios.post(
       "https://resume-builder-backend-suc5.onrender.com/api/auth/login",
